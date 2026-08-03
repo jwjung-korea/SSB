@@ -56,6 +56,8 @@ area/reaction factor.
 match the original coldspot loading pattern. The first block uses the UMAT's
 built-in coldspot fallback by default, then contact-aware BV maps are applied
 from the second block onward.
+For a strict first-block match with a previously converged baseline, pass the
+baseline UMAT with `--first-umat`; restart blocks still use `--umat`.
 
 Dry-run example:
 
@@ -63,6 +65,7 @@ Dry-run example:
 python simulations\elastic_plastic_coldspot\scripts\run_staggered_bv_blocks.py `
   --base-inp simulations\elastic_plastic_coldspot\inputs\final_v2_p5.inp `
   --umat simulations\elastic_plastic_coldspot\src\umat_EP_coldspot.for `
+  --first-umat C:\Abaqus_Work\lithium_electrodeposition\elastic_plastic_coldspot\umat_EP_coldspot.for `
   --workdir C:\Abaqus_Work\lithium_electrodeposition\bv216_p5 `
   --job-prefix p5_bv216 `
   --dry-run
@@ -74,6 +77,7 @@ Actual run:
 python simulations\elastic_plastic_coldspot\scripts\run_staggered_bv_blocks.py `
   --base-inp simulations\elastic_plastic_coldspot\inputs\final_v2_p5.inp `
   --umat simulations\elastic_plastic_coldspot\src\umat_EP_coldspot.for `
+  --first-umat C:\Abaqus_Work\lithium_electrodeposition\elastic_plastic_coldspot\umat_EP_coldspot.for `
   --workdir C:\Abaqus_Work\lithium_electrodeposition\bv216_p5 `
   --job-prefix p5_bv216
 ```
@@ -84,6 +88,7 @@ Actual run with one joined ODB at the end:
 python simulations\elastic_plastic_coldspot\scripts\run_staggered_bv_blocks.py `
   --base-inp simulations\elastic_plastic_coldspot\inputs\final_v2_p5.inp `
   --umat simulations\elastic_plastic_coldspot\src\umat_EP_coldspot.for `
+  --first-umat C:\Abaqus_Work\lithium_electrodeposition\elastic_plastic_coldspot\umat_EP_coldspot.for `
   --workdir C:\Abaqus_Work\lithium_electrodeposition\bv216_p5 `
   --job-prefix p5_bv216 `
   --join-odb `

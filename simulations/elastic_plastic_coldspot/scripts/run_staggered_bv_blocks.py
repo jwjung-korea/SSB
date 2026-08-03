@@ -282,6 +282,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-inp", type=Path, required=True)
     parser.add_argument("--umat", type=Path, required=True)
+    parser.add_argument("--first-umat", type=Path, default=None)
     parser.add_argument("--workdir", type=Path, required=True)
     parser.add_argument("--job-prefix", default="bv216")
     parser.add_argument("--block-seconds", type=float, default=216.0)
@@ -313,9 +314,20 @@ def main() -> None:
     args.abaqus_cmd = find_abaqus_command(args.abaqus_cmd)
 
     args.workdir.mkdir(parents=True, exist_ok=True)
-    umat = args.workdir / args.umat.name
+    umat_name = args.umat.name
+    if args.first_umat is not None and args.first_umat.name == args.umat.name:
+        umat_name = "coupled_" + args.umat.name
+    umat = args.workdir / umat_name
     if not args.dry_run:
         shutil.copy2(args.umat, umat)
+    first_umat = umat
+    if args.first_umat is not None:
+        first_name = args.first_umat.name
+        if first_name == umat_name or args.first_umat.name == args.umat.name:
+            first_name = "first_" + args.first_umat.name
+        first_umat = args.workdir / first_name
+        if not args.dry_run:
+            shutil.copy2(args.first_umat, first_umat)
 
     nblocks = int(round(args.total_seconds / args.block_seconds))
     if nblocks < 1:
@@ -345,7 +357,7 @@ def main() -> None:
         make_first_block_input(args.base_inp, first_inp, args.block_seconds)
     run([
         args.abaqus_cmd, f"job={first_job}", f"input={first_inp}",
-        f"user={umat}", "double=both", "cpus=4", "interactive"
+        f"user={first_umat}", "double=both", "cpus=4", "interactive"
     ], cwd=args.workdir, dry_run=args.dry_run)
 
     previous_job = first_job
