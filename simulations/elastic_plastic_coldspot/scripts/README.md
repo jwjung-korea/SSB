@@ -53,7 +53,9 @@ area/reaction factor.
 `run_staggered_bv_blocks.py` automates repeated Abaqus blocks with a refreshed
 `cdot_map.csv` every `216 s`. The default run covers `21600 s` and uses
 `--mode cycling`, which alternates plating and stripping every `2160 s` to
-match the original coldspot loading pattern.
+match the original coldspot loading pattern. The first block uses the UMAT's
+built-in coldspot fallback by default, then contact-aware BV maps are applied
+from the second block onward.
 
 Dry-run example:
 

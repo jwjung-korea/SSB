@@ -294,6 +294,8 @@ def main() -> None:
     parser.add_argument("--eta", type=float, default=-0.05)
     parser.add_argument("--j0", type=float, default=1.0)
     parser.add_argument("--base-cdot", type=float, default=103.643)
+    parser.add_argument("--initial-map", choices=("fallback", "bv"),
+                        default="fallback")
     parser.add_argument("--interface-width", type=float, default=20.0)
     parser.add_argument("--initial-dx", type=float, default=0.1)
     parser.add_argument("--cleanup-old-jobs", action="store_true")
@@ -319,15 +321,23 @@ def main() -> None:
     if nblocks < 1:
         raise ValueError("total-seconds must be at least one block")
 
-    initial_interface = args.workdir / "interface_initial.csv"
-    if not args.dry_run:
-        write_initial_interface_csv(initial_interface, args.interface_width,
-                                    args.initial_dx)
-    generate_map(args.python_cmd, initial_interface, args.workdir / "cdot_map.csv",
-                 args.workdir / "bv_current_b001.csv",
-                 mode_for_block(args.mode, 1, args.block_seconds,
-                                args.cycle_seconds),
-                 args.eta, args.j0, args.base_cdot, args.dry_run)
+    if args.initial_map == "bv":
+        initial_interface = args.workdir / "interface_initial.csv"
+        if not args.dry_run:
+            write_initial_interface_csv(initial_interface, args.interface_width,
+                                        args.initial_dx)
+        generate_map(args.python_cmd, initial_interface,
+                     args.workdir / "cdot_map.csv",
+                     args.workdir / "bv_current_b001.csv",
+                     mode_for_block(args.mode, 1, args.block_seconds,
+                                    args.cycle_seconds),
+                     args.eta, args.j0, args.base_cdot, args.dry_run)
+    else:
+        stale_map = args.workdir / "cdot_map.csv"
+        if stale_map.exists():
+            print("remove-stale-initial-map: " + str(stale_map))
+            if not args.dry_run:
+                stale_map.unlink()
 
     first_job = f"{args.job_prefix}_b001"
     first_inp = args.workdir / f"{first_job}.inp"
