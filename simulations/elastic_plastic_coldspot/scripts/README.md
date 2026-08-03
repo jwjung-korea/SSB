@@ -47,3 +47,42 @@ Model variables:
 The script does not solve an electrolyte potential field. It uses one global
 overpotential and lets mechanics enter through the effective active contact
 area/reaction factor.
+
+## 216 s Staggered Block Runner
+
+`run_staggered_bv_blocks.py` automates repeated Abaqus blocks with a refreshed
+`cdot_map.csv` every `216 s`. The default run covers `21600 s` and uses
+`--mode cycling`, which alternates plating and stripping every `2160 s` to
+match the original coldspot loading pattern.
+
+Dry-run example:
+
+```powershell
+python simulations\elastic_plastic_coldspot\scripts\run_staggered_bv_blocks.py `
+  --base-inp simulations\elastic_plastic_coldspot\inputs\final_v2_p5.inp `
+  --umat simulations\elastic_plastic_coldspot\src\umat_EP_coldspot.for `
+  --workdir C:\Abaqus_Work\lithium_electrodeposition\bv216_p5 `
+  --job-prefix p5_bv216 `
+  --dry-run
+```
+
+Actual run:
+
+```powershell
+python simulations\elastic_plastic_coldspot\scripts\run_staggered_bv_blocks.py `
+  --base-inp simulations\elastic_plastic_coldspot\inputs\final_v2_p5.inp `
+  --umat simulations\elastic_plastic_coldspot\src\umat_EP_coldspot.for `
+  --workdir C:\Abaqus_Work\lithium_electrodeposition\bv216_p5 `
+  --job-prefix p5_bv216
+```
+
+The runner creates a first 216 s input, enables restart output, then runs
+subsequent blocks with `oldjob=<previous block>`. Each completed block is
+post-processed into an interface CSV, passed through the Butler-Volmer map
+generator, and used as the next block's `cdot_map.csv`.
+
+By default, the runner keeps every block output from `0 s` to the final time
+so the full deposition/dissolution history remains available for plotting and
+inspection. If disk usage becomes a problem, add `--cleanup-old-jobs` to delete
+older heavy Abaqus job files after they are no longer the immediate restart
+source. CSV history is still preserved unless `--cleanup-csv` is also supplied.
