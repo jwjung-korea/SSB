@@ -1,0 +1,14 @@
+Models in CAE:
+  Model: Job-2
+    Parts: ['LITHIUM_SE', 'Part-2']
+    Steps: ['Initial', 'Step-1']
+    Interactions: ['Int-1']
+  Model: Lithium_Model
+    Parts: ['LITHIUM_SE']
+    Steps: ['Initial', 'Step-1']
+    Interactions: []
+  Model: Model-1
+    Parts: []
+    Steps: ['Initial']
+    Interactions: []
+Jobs in Mdb: ['Job-1']

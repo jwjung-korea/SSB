@@ -1,0 +1,28 @@
+Seeded left and right edges with end2Edges successfully.
+Node Y coordinates along left edge (x=0) for end2Edges:
+  Node Label: 1, Y: 0.0000
+  Node Label: 102, Y: 0.3989
+  Node Label: 203, Y: 0.7719
+  Node Label: 304, Y: 1.1208
+  Node Label: 405, Y: 1.4470
+  Node Label: 506, Y: 1.7521
+  Node Label: 607, Y: 2.0373
+  Node Label: 708, Y: 2.3041
+  Node Label: 809, Y: 2.5536
+  Node Label: 910, Y: 2.7869
+  Node Label: 1011, Y: 3.0050
+  Node Label: 1112, Y: 3.2090
+  Node Label: 1213, Y: 3.3998
+  Node Label: 1314, Y: 3.5782
+  Node Label: 1415, Y: 3.7450
+  Node Label: 1516, Y: 3.9010
+  Node Label: 1617, Y: 4.0469
+  Node Label: 1718, Y: 4.1833
+  Node Label: 1819, Y: 4.3109
+  Node Label: 1920, Y: 4.4302
+  Node Label: 2021, Y: 4.5418
+  Node Label: 2122, Y: 4.6461
+  Node Label: 2223, Y: 4.7437
+  Node Label: 2324, Y: 4.8349
+  Node Label: 2425, Y: 4.9202
+  Node Label: 2526, Y: 5.0000

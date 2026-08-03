@@ -1,0 +1,7 @@
+Section Assignments in Part LITHIUM_SE:
+  Section: SEC_LLZO
+    Region error: 'tuple' object has no attribute 'faces'
+  Section: SEC_SEED
+    Region error: 'tuple' object has no attribute 'faces'
+  Section: SEC_LITHIUM
+    Region error: 'tuple' object has no attribute 'faces'

@@ -1,0 +1,88 @@
+# -*- coding: mbcs -*-
+from mesh import *
+mdb.Model(name='Lithium_Model')
+mdb.models['Lithium_Model'].Material(name='LITHIUM_IP')
+mdb.models['Lithium_Model'].materials['LITHIUM_IP'].UserMaterial(
+    mechanicalConstants=(7200.0, 0.38, 3.1, 5.7, 2.0, 2.0, 1.3e-05, 0.0, 1.0, 
+    0.0, 103.643), type=MECHANICAL)
+mdb.models['Lithium_Model'].materials['LITHIUM_IP'].Depvar(n=24)
+mdb.models['Lithium_Model'].Material(name='LITHIUM_SUB')
+mdb.models['Lithium_Model'].materials['LITHIUM_SUB'].UserMaterial(
+    mechanicalConstants=(7200.0, 0.38, 3.1, 5.7, 2.0, 2.0, 1.3e-05, 0.0, 1.0, 
+    0.0, 0.0), type=MECHANICAL)
+mdb.models['Lithium_Model'].materials['LITHIUM_SUB'].Depvar(n=24)
+mdb.models['Lithium_Model'].Material(name='LLZO')
+mdb.models['Lithium_Model'].materials['LLZO'].Elastic(table=((150000.0, 0.25), 
+    ))
+mdb.models['Lithium_Model'].HomogeneousSolidSection(material='LLZO', name=
+    'SEC_LLZO', thickness=None)
+mdb.models['Lithium_Model'].HomogeneousSolidSection(material='LITHIUM_IP', 
+    name='SEC_SEED', thickness=None)
+mdb.models['Lithium_Model'].HomogeneousSolidSection(material='LITHIUM_SUB', 
+    name='SEC_LITHIUM', thickness=None)
+mdb.models['Lithium_Model'].ConstrainedSketch(name='__profile__', sheetSize=
+    100.0)
+mdb.models['Lithium_Model'].sketches['__profile__'].rectangle(point1=(0.0, 0.0)
+    , point2=(20.0, 5.0))
+mdb.models['Lithium_Model'].Part(dimensionality=TWO_D_PLANAR, name='LLZO_PART', 
+    type=DEFORMABLE_BODY)
+mdb.models['Lithium_Model'].parts['LLZO_PART'].BaseShell(sketch=
+    mdb.models['Lithium_Model'].sketches['__profile__'])
+mdb.models['Lithium_Model'].parts['LLZO_PART'].SectionAssignment(region=Region(
+    faces=mdb.models['Lithium_Model'].parts['LLZO_PART'].faces.getSequenceFromMask(
+    mask=('[#1 ]', ), )), sectionName='SEC_LLZO')
+mdb.models['Lithium_Model'].ConstrainedSketch(name='__profile__', sheetSize=
+    100.0)
+mdb.models['Lithium_Model'].sketches['__profile__'].rectangle(point1=(0.0, 5.0)
+    , point2=(20.0, 10.5))
+mdb.models['Lithium_Model'].Part(dimensionality=TWO_D_PLANAR, name=
+    'LITHIUM_PART', type=DEFORMABLE_BODY)
+mdb.models['Lithium_Model'].parts['LITHIUM_PART'].BaseShell(sketch=
+    mdb.models['Lithium_Model'].sketches['__profile__'])
+mdb.models['Lithium_Model'].parts['LITHIUM_PART'].PartitionFaceByShortestPath(
+    faces=mdb.models['Lithium_Model'].parts['LITHIUM_PART'].faces, point1=(0.0, 
+    5.5, 0.0), point2=(20.0, 5.5, 0.0))
+mdb.models['Lithium_Model'].parts['LITHIUM_PART'].SectionAssignment(region=
+    Region(
+    faces=mdb.models['Lithium_Model'].parts['LITHIUM_PART'].faces.getSequenceFromMask(
+    mask=('[#2 ]', ), )), sectionName='SEC_SEED')
+mdb.models['Lithium_Model'].parts['LITHIUM_PART'].SectionAssignment(region=
+    Region(
+    faces=mdb.models['Lithium_Model'].parts['LITHIUM_PART'].faces.getSequenceFromMask(
+    mask=('[#1 ]', ), )), sectionName='SEC_LITHIUM')
+mdb.models['Lithium_Model'].rootAssembly.Instance(dependent=OFF, name=
+    'LLZO_INST', part=mdb.models['Lithium_Model'].parts['LLZO_PART'])
+mdb.models['Lithium_Model'].rootAssembly.Instance(dependent=OFF, name=
+    'LITHIUM_INST', part=mdb.models['Lithium_Model'].parts['LITHIUM_PART'])
+mdb.models['Lithium_Model'].rootAssembly.Set(edges=
+    mdb.models['Lithium_Model'].rootAssembly.instances['LLZO_INST'].edges.getSequenceFromMask(
+    mask=('[#1 ]', ), ), name='BOTTOM')
+mdb.models['Lithium_Model'].rootAssembly.Set(edges=
+    mdb.models['Lithium_Model'].rootAssembly.instances['LLZO_INST'].edges.getSequenceFromMask(
+    mask=('[#8 ]', ), )+\
+    mdb.models['Lithium_Model'].rootAssembly.instances['LITHIUM_INST'].edges.getSequenceFromMask(
+    mask=('[#18 ]', ), ), name='LEFT')
+mdb.models['Lithium_Model'].rootAssembly.Set(edges=
+    mdb.models['Lithium_Model'].rootAssembly.instances['LLZO_INST'].edges.getSequenceFromMask(
+    mask=('[#2 ]', ), )+\
+    mdb.models['Lithium_Model'].rootAssembly.instances['LITHIUM_INST'].edges.getSequenceFromMask(
+    mask=('[#42 ]', ), ), name='RIGHT')
+mdb.models['Lithium_Model'].rootAssembly.Surface(name='TOP_SURFACE', 
+    side1Edges=
+    mdb.models['Lithium_Model'].rootAssembly.instances['LITHIUM_INST'].edges.getSequenceFromMask(
+    mask=('[#4 ]', ), ))
+mdb.models['Lithium_Model'].rootAssembly.Surface(name='LLZO_TOP_SURF', 
+    side1Edges=
+    mdb.models['Lithium_Model'].rootAssembly.instances['LLZO_INST'].edges.getSequenceFromMask(
+    mask=('[#4 ]', ), ))
+mdb.models['Lithium_Model'].rootAssembly.Surface(name='LITHIUM_BOT_SURF', 
+    side1Edges=
+    mdb.models['Lithium_Model'].rootAssembly.instances['LITHIUM_INST'].edges.getSequenceFromMask(
+    mask=('[#20 ]', ), ))
+mdb.models['Lithium_Model'].rootAssembly.Set(faces=
+    mdb.models['Lithium_Model'].rootAssembly.instances['LITHIUM_INST'].faces, 
+    name='LITHIUM_NODES_SET')
+mdb.models['Lithium_Model'].ContactProperty('IntProp-1')
+mdb.models['Lithium_Model'].interactionProperties['IntProp-1'].TangentialBehavior(
+    formulation=PENALTY, table=((0.1, ), ))
+#* ValueError: Elastic slip tolerance fraction must be greater than zero.

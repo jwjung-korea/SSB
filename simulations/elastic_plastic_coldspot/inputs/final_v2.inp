@@ -1,0 +1,182 @@
+*Heading
+** Job name: final_v2 Model name: Model-1
+** Refined mesh at coldspot boundaries (x=9, x=11)
+** Golden State properties preserved. DO NOT edit final_m.inp.
+*Preprint, echo=NO, model=NO, history=NO, contact=NO
+**
+** PARTS
+**
+*Part, name=LITHIUM_SE
+*Node
+** Bottom row key nodes (y=0)
+      1,           0.,           0.
+      8,           7.,           0.
+     11,          8.5,           0.
+     21,          9.5,           0.
+     23,         10.5,           0.
+     33,         11.5,           0.
+     36,         13.0,           0.
+     43,         20.0,           0.
+** Interface-1 key nodes (y=5.0)
+    431,           0.,           5.
+    438,           7.,           5.
+    441,          8.5,           5.
+    451,          9.5,           5.
+    453,         10.5,           5.
+    463,         11.5,           5.
+    466,         13.0,           5.
+    473,         20.0,           5.
+** Interface-2 key nodes (y=5.5)
+    861,           0.,           5.5
+    868,           7.,           5.5
+    871,          8.5,           5.5
+    881,          9.5,           5.5
+    883,         10.5,           5.5
+    893,         11.5,           5.5
+    896,         13.0,           5.5
+    903,         20.0,           5.5
+** Top key nodes (y=10.5)
+   1291,           0.,          10.5
+   1298,           7.,          10.5
+   1301,          8.5,          10.5
+   1311,          9.5,          10.5
+   1313,         10.5,          10.5
+   1323,         11.5,          10.5
+   1326,         13.0,          10.5
+   1333,         20.0,          10.5
+**
+** ---- X-direction node generation (43 nodes/row, 42 elements/row) ----
+** Segment layout:
+**   0-7    : 1.0um (7 intervals)
+**   7-8.5  : 0.5um (3 intervals)
+**   8.5-9.5: 0.1um (10 intervals) <-- fine at x=9 boundary
+**   9.5-10.5: 0.5um (2 intervals)
+**   10.5-11.5: 0.1um (10 intervals) <-- fine at x=11 boundary
+**   11.5-13 : 0.5um (3 intervals)
+**   13-20  : 1.0um (7 intervals)
+**
+*NGEN, NSET=L_BOT
+1, 8, 1
+8, 11, 1
+11, 21, 1
+21, 23, 1
+23, 33, 1
+33, 36, 1
+36, 43, 1
+*NGEN, NSET=L_INT1
+431, 438, 1
+438, 441, 1
+441, 451, 1
+451, 453, 1
+453, 463, 1
+463, 466, 1
+466, 473, 1
+*NGEN, NSET=L_INT2
+861, 868, 1
+868, 871, 1
+871, 881, 1
+881, 883, 1
+883, 893, 1
+893, 896, 1
+896, 903, 1
+*NGEN, NSET=L_TOP
+1291, 1298, 1
+1298, 1301, 1
+1301, 1311, 1
+1311, 1313, 1
+1313, 1323, 1
+1323, 1326, 1
+1326, 1333, 1
+**
+** ---- Y-direction fill (10+10+10 = 30 layers, row increment = 43) ----
+*Nfill, nset=SET_LLZO_NODES
+L_BOT, L_INT1, 10, 43
+*Nfill, nset=SET_SEED_NODES
+L_INT1, L_INT2, 10, 43
+*Nfill, nset=SET_LITHIUM_NODES
+L_INT2, L_TOP, 10, 43
+*Nset, nset=ALL_NODES
+SET_LLZO_NODES, SET_SEED_NODES, SET_LITHIUM_NODES
+**
+** ---- Elements (42 per row x 30 rows = 1260 total) ----
+*Element, type=CPE4H
+1, 1, 2, 45, 44
+*Elgen, elset=ALL_ELEMENTS
+1, 42, 1, 1, 30, 43, 42
+**
+** ---- Section assignments ----
+*Elset, elset=SET_LLZO, generate
+1, 420, 1
+*Elset, elset=SET_SEED, generate
+421, 840, 1
+*Elset, elset=SET_LITHIUM, generate
+841, 1260, 1
+*Solid Section, elset=SET_LLZO, material=LLZO
+1.
+*Solid Section, elset=SET_SEED, material=LITHIUM_IP
+1.
+*Solid Section, elset=SET_LITHIUM, material=LITHIUM_SUB
+1.
+*End Part
+**
+** ASSEMBLY
+**
+*Assembly, name=Assembly
+*Instance, name=LITHIUM_INST, part=LITHIUM_SE
+*End Instance
+*Nset, nset=BOTTOM, instance=LITHIUM_INST, generate
+1, 43, 1
+*Nset, nset=LEFT, instance=LITHIUM_INST, generate
+1, 1291, 43
+*Nset, nset=RIGHT, instance=LITHIUM_INST, generate
+43, 1333, 43
+*Nset, nset=TOP_NODES, instance=LITHIUM_INST, generate
+1291, 1333, 1
+*Elset, elset=TOP_SURF_EL, instance=LITHIUM_INST, generate
+1219, 1260, 1
+*Surface, type=ELEMENT, name=TOP_SURFACE
+TOP_SURF_EL, S3
+*End Assembly
+**
+** MATERIALS (Golden State - DO NOT MODIFY)
+**
+*Material, name=LITHIUM_IP
+*User material, Constants=11
+  7.2e3,   0.38,  3.1,  5.7,   2.0,  2.0,  1.3e-05, 0.0,   1.0,   0.0,   103.643
+*Depvar
+24
+*Material, name=LITHIUM_SUB
+*User material, Constants=11
+  7.2e3,   0.38,  3.1,  5.7,   2.0,  2.0,  1.3e-05, 0.0,   1.0,   0.0,   0.0
+*Depvar
+24
+*Material, name=LLZO
+*Elastic
+150000., 0.25
+**
+** INITIAL CONDITIONS
+*Initial Conditions, type=TEMPERATURE
+LITHIUM_INST.ALL_NODES, 0.0
+**
+** STEP
+*Restart, write, frequency=1
+*Step, name=Step-1, nlgeom=YES, inc=100000
+*Static, stabilize, factor=0.002, allsdtol=0, continue=NO
+0.001, 21600.0, 1.e-7, 1.0
+*CONTROLS, PARAMETERS=TIME INCREMENTATION
+,,,,,,,30,,,,,,
+*Boundary
+BOTTOM, 1, 2
+LEFT, 1, 1
+RIGHT, 1, 1
+*Dsload
+TOP_SURFACE, P, 0.1
+*Output, field, frequency=10
+*Node Output
+U, RF, NT
+*Element Output, directions=YES
+S, LE, SDV, STATUS
+*Output, history, frequency=1
+*Node Output, nset=TOP_NODES
+U2
+*End Step

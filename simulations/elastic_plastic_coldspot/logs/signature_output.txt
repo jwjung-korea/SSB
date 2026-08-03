@@ -1,0 +1,5 @@
+DOC ON session.XYDataFromPath:
+Session.XYDataFromPath(path, includeIntersections, shape, pathStyle, numIntervals, labelType <, name, viewport, step, frame, variable, deformedMag, numericForm, complexAngle>) -> This method creates an XYData object from path information.
+
+DOC ON xyPlot.XYDataFromPath:
+sys.modules['xyPlot'].XYDataFromPath(path, includeIntersections, shape, pathStyle, numIntervals, labelType <, name, viewport, step, frame, variable, deformedMag, numericForm, complexAngle>) -> This method creates an XYData object from path information.

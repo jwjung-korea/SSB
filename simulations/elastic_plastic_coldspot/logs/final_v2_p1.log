@@ -1,0 +1,35 @@
+Analysis initiated from SIMULIA established products
+Abaqus JOB final_v2_p1
+Abaqus 3DEXPERIENCE R2017x
+Abaqus License Manager checked out the following licenses:
+Abaqus/Standard checked out 5 tokens from Flexnet server localhost.
+<1019 out of 1024 licenses remain available>.
+Begin Compiling Abaqus/Standard User Subroutines
+2026-05-23(토) 오후 4:52
+Intel(R) Fortran Intel(R) 64 Compiler Classic for applications running on Intel(R) 64, Version 2021.13.1 Build 20240703_000000
+Copyright (C) 1985-2024 Intel Corporation.  All rights reserved.
+
+End Compiling Abaqus/Standard User Subroutines
+Begin Linking Abaqus/Standard User Subroutines
+   standardU.lib 라이브러리 및 standardU.exp 개체를 생성하고 있습니다.
+LINK : warning LNK4217: 'printf'에 정의된 'libirc.lib(irc_msg_support.c.obj)' 기호를 함수 'standardU_static.lib(SMAStsStdU_IF.obj)'에서 '"void __cdecl SMABasOmniSetSSELevel(void)" (?SMABasOmniSetSSELevel@@YAXXZ)'이(가) 가져왔습니다.
+libirc.lib(fast_mem_ops.c.obj) : warning LNK4210: .CRT 섹션이 있습니다. 처리되지 않은 정적 이니셜라이저 또는 종결자가 있을 수 있습니다.
+End Linking Abaqus/Standard User Subroutines
+2026-05-23(토) 오후 4:52
+Begin Analysis Input File Processor
+2026-05-23(토) 오후 4:52
+Run pre.exe
+2026-05-23(토) 오후 4:52
+End Analysis Input File Processor
+Begin Abaqus/Standard Analysis
+2026-05-23(토) 오후 4:52
+Run standard.exe
+2026-05-23(토) 오후 10:15
+Abaqus Error: Abaqus/Standard Analysis exited with an error - Please see the 
+message file for possible error messages if the file exists.
+Begin MFS->SFS and SIM cleanup
+2026-05-23(토) 오후 10:15
+Run SMASimUtility.exe
+2026-05-23(토) 오후 10:15
+End MFS->SFS and SIM cleanup
+Abaqus/Analysis exited with errors

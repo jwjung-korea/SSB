@@ -1,0 +1,19 @@
+# Abaqus heavy/generated analysis outputs
+*.odb
+*.sim
+*.ipm
+*.mdl
+*.prt
+*.res
+*.stt
+*.023
+*.msg
+
+# Abaqus transient/replay dumps
+*.dmp
+*.lck
+
+# Local scratch/output folders
+scratch/
+temp/
+work/

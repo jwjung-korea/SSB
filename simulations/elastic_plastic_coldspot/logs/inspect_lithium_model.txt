@@ -1,0 +1,14 @@
+Model: Lithium_Model
+Parts:
+  Part: LITHIUM_SE
+    Num Faces: 5
+    Num Edges: 16
+    Num Vertices: 12
+    Sections:
+      Section name: SEC_LLZO, Region: ('_PickedSet4', 'LITHIUM_SE', 2, 1, 1)
+      Section name: SEC_SEED, Region: ('_PickedSet5', 'LITHIUM_SE', 2, 1, 1)
+      Section name: SEC_LITHIUM, Region: ('_PickedSet6', 'LITHIUM_SE', 2, 1, 1)
+Assembly Instances:
+  Instance: LITHIUM_INST, Part: LITHIUM_SE
+  Sets: ['BOTTOM', 'LEFT', 'RIGHT', 'TOP_NODES']
+  Surfaces: ['TOP_SURFACE']

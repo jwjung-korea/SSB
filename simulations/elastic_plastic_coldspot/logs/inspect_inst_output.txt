@@ -1,0 +1,3 @@
+Instance faces type: <type 'Sequence'>
+Instance faces count: 2
+Instance cells count: 0
