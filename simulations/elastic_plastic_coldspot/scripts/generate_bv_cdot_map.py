@@ -113,8 +113,12 @@ def main() -> None:
 
     parser.add_argument("--base-cdot", type=float, default=103.643,
                         help="Mean UMAT cdot magnitude to preserve.")
-    parser.add_argument("--j0", type=float, default=1.0,
-                        help="Reference exchange current density in A/m^2.")
+    parser.add_argument("--j0", type=float, default=None,
+                        help="Reference exchange current density in A/m^2. "
+                             "If omitted, F*k-neg is used.")
+    parser.add_argument("--k-neg", type=float, default=0.01,
+                        help="Negative-electrode reaction rate constant in "
+                             "mol/(m^2 s), matching Tian and Qi Table II.")
     parser.add_argument("--eta", type=float, default=-0.05,
                         help="Global overpotential in V. Negative favors plating.")
     parser.add_argument("--alpha", type=float, default=0.5,
@@ -133,6 +137,7 @@ def main() -> None:
     args = parser.parse_args()
 
     mode_sign = 1.0 if args.mode == "plating" else -1.0
+    reference_j0 = args.j0 if args.j0 is not None else FARADAY * args.k_neg
     rows = read_rows(args.interface_csv)
 
     records: list[dict[str, float]] = []
@@ -142,7 +147,7 @@ def main() -> None:
                                    args.open_weight)
         a_cold = cold_factor(x)
         active_factor = a_contact * a_cold
-        j0_eff = args.j0 * active_factor
+        j0_eff = reference_j0 * active_factor
         j_bv = bv_current_density(j0_eff, args.eta, args.alpha,
                                   args.temperature,
                                   args.concentration_ratio)
