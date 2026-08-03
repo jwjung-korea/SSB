@@ -179,7 +179,9 @@ def make_first_block_input(base_inp: Path, out_inp: Path,
             pending_dynamic = True
             continue
         if line.lstrip().lower().startswith("*restart, write"):
-            new_lines.append("*Restart, write, frequency=1, overlay\n")
+            new_lines.append(
+                "*Restart, write, number interval=1, time marks=YES\n"
+            )
             continue
         new_lines.append(line)
     write_text(out_inp, new_lines)
@@ -228,7 +230,7 @@ def make_restart_input(first_block_inp: Path, out_inp: Path,
             pending_dynamic = True
             continue
         if lower.startswith("*restart, write"):
-            out.append("*Restart, write, frequency=1, overlay\n")
+            out.append("*Restart, write, number interval=1, time marks=YES\n")
             continue
         out.append(line)
     out.append("*End Step\n")

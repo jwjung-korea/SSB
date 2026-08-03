@@ -95,10 +95,10 @@ python simulations\elastic_plastic_coldspot\scripts\run_staggered_bv_blocks.py `
   --delete-after-join
 ```
 
-The runner creates a first 216 s input, enables restart output, then runs
-subsequent blocks with `oldjob=<previous block>`. Each completed block is
-post-processed into an interface CSV, passed through the Butler-Volmer map
-generator, and used as the next block's `cdot_map.csv`.
+The runner creates a first 216 s input, enables restart output at the end of
+each 216 s block, then runs subsequent blocks with `oldjob=<previous block>`.
+Each completed block is post-processed into an interface CSV, passed through
+the Butler-Volmer map generator, and used as the next block's `cdot_map.csv`.
 
 By default, the runner keeps every block output from `0 s` to the final time
 so the full deposition/dissolution history remains available for plotting and
