@@ -76,6 +76,18 @@ python simulations\elastic_plastic_coldspot\scripts\run_staggered_bv_blocks.py `
   --job-prefix p5_bv216
 ```
 
+Actual run with one joined ODB at the end:
+
+```powershell
+python simulations\elastic_plastic_coldspot\scripts\run_staggered_bv_blocks.py `
+  --base-inp simulations\elastic_plastic_coldspot\inputs\final_v2_p5.inp `
+  --umat simulations\elastic_plastic_coldspot\src\umat_EP_coldspot.for `
+  --workdir C:\Abaqus_Work\lithium_electrodeposition\bv216_p5 `
+  --job-prefix p5_bv216 `
+  --join-odb `
+  --delete-after-join
+```
+
 The runner creates a first 216 s input, enables restart output, then runs
 subsequent blocks with `oldjob=<previous block>`. Each completed block is
 post-processed into an interface CSV, passed through the Butler-Volmer map
@@ -86,3 +98,10 @@ so the full deposition/dissolution history remains available for plotting and
 inspection. If disk usage becomes a problem, add `--cleanup-old-jobs` to delete
 older heavy Abaqus job files after they are no longer the immediate restart
 source. CSV history is still preserved unless `--cleanup-csv` is also supplied.
+
+For the end-of-run cleanup path, `--join-odb` creates
+`<job-prefix>_joined.odb` by appending the restart ODB files in order with
+`abaqus restartjoin`. `--delete-after-join` then removes the intermediate heavy
+Abaqus job files only after the joined ODB command succeeds. The interface and
+Butler-Volmer CSV histories are kept by default; add `--delete-csv-after-join`
+only if those CSV time histories are no longer needed.

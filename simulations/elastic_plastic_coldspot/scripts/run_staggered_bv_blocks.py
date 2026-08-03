@@ -67,6 +67,68 @@ def cleanup_job_files(workdir: Path, job_prefix: str, completed_block: int,
                     path.unlink()
 
 
+def delete_intermediate_job_files(workdir: Path, job_prefix: str, nblocks: int,
+                                  keep_csv: bool, keep_restart: bool,
+                                  dry_run: bool) -> None:
+    removable_exts = {
+        ".odb", ".sim", ".msg", ".sta", ".dat", ".prt", ".com", ".log",
+        ".023", ".ipm", ".mdl", ".dmp",
+    }
+    if not keep_restart:
+        removable_exts.update({".res", ".stt"})
+
+    for block in range(1, nblocks + 1):
+        job = f"{job_prefix}_b{block:03d}"
+        for path in workdir.iterdir():
+            if not path.is_file():
+                continue
+            should_delete = path.stem == job and path.suffix.lower() in removable_exts
+            if not keep_csv:
+                should_delete = should_delete or path.name == f"interface_b{block:03d}.csv"
+                should_delete = should_delete or path.name == f"bv_current_b{block:03d}.csv"
+            if should_delete:
+                print("delete-after-join: " + str(path))
+                if not dry_run:
+                    path.unlink()
+
+
+def join_odb_history(abaqus_cmd: str, workdir: Path, job_prefix: str,
+                     nblocks: int, joined_name: str, include_history: bool,
+                     compress: bool, dry_run: bool) -> Path:
+    if nblocks < 1:
+        raise ValueError("nblocks must be positive")
+
+    joined = workdir / joined_name
+    if joined.suffix.lower() != ".odb":
+        joined = joined.with_suffix(".odb")
+    first_odb = workdir / f"{job_prefix}_b001.odb"
+
+    print(f"join-odb: {first_odb} -> {joined}")
+    if not dry_run:
+        if not first_odb.exists():
+            raise FileNotFoundError(first_odb)
+        if joined.exists():
+            joined.unlink()
+        shutil.copy2(first_odb, joined)
+
+    extra_flags = []
+    if include_history:
+        extra_flags.append("history")
+    if compress:
+        extra_flags.append("compressresult")
+
+    for block in range(2, nblocks + 1):
+        restart_odb = workdir / f"{job_prefix}_b{block:03d}.odb"
+        run([
+            abaqus_cmd, "restartjoin",
+            f"originalodb={joined}",
+            f"restartodb={restart_odb}",
+            *extra_flags,
+        ], cwd=workdir, dry_run=dry_run)
+
+    return joined
+
+
 def read_text(path: Path) -> list[str]:
     return path.read_text(errors="ignore").splitlines(keepends=True)
 
@@ -215,6 +277,13 @@ def main() -> None:
     parser.add_argument("--cleanup-old-jobs", action="store_true")
     parser.add_argument("--keep-blocks", type=int, default=1)
     parser.add_argument("--cleanup-csv", action="store_true")
+    parser.add_argument("--join-odb", action="store_true")
+    parser.add_argument("--joined-odb", default=None)
+    parser.add_argument("--join-history", action="store_true")
+    parser.add_argument("--no-join-compress", action="store_true")
+    parser.add_argument("--delete-after-join", action="store_true")
+    parser.add_argument("--delete-csv-after-join", action="store_true")
+    parser.add_argument("--delete-restart-after-join", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
@@ -275,6 +344,22 @@ def main() -> None:
                           args.keep_blocks, args.cleanup_old_jobs,
                           args.cleanup_csv, args.dry_run)
         previous_job = job
+
+    if args.join_odb:
+        joined_name = args.joined_odb or f"{args.job_prefix}_joined.odb"
+        joined = join_odb_history(
+            args.abaqus_cmd, args.workdir, args.job_prefix, nblocks,
+            joined_name, args.join_history, not args.no_join_compress,
+            args.dry_run,
+        )
+        print("joined-odb: " + str(joined))
+        if args.delete_after_join:
+            delete_intermediate_job_files(
+                args.workdir, args.job_prefix, nblocks,
+                keep_csv=not args.delete_csv_after_join,
+                keep_restart=not args.delete_restart_after_join,
+                dry_run=args.dry_run,
+            )
 
 
 if __name__ == "__main__":
