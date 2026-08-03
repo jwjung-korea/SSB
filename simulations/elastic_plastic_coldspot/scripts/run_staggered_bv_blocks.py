@@ -32,7 +32,29 @@ def run(cmd: list[str], cwd: Path, dry_run: bool = False) -> None:
     print("+ " + " ".join(str(part) for part in cmd))
     if dry_run:
         return
-    subprocess.run(cmd, cwd=str(cwd), check=True)
+    try:
+        subprocess.run(cmd, cwd=str(cwd), check=True)
+    except FileNotFoundError as exc:
+        raise FileNotFoundError(
+            f"Could not find command '{cmd[0]}'. If Abaqus is installed but "
+            "not on PATH, pass --abaqus-cmd C:\\SIMULIA\\Commands\\abaqus.bat"
+        ) from exc
+
+
+def find_abaqus_command(requested: str | None) -> str:
+    if requested:
+        return requested
+
+    for name in ("abaqus", "abq2017"):
+        found = shutil.which(name)
+        if found:
+            return found
+
+    common = Path(r"C:\SIMULIA\Commands\abaqus.bat")
+    if common.exists():
+        return str(common)
+
+    return "abaqus"
 
 
 def cleanup_job_files(workdir: Path, job_prefix: str, completed_block: int,
@@ -264,7 +286,7 @@ def main() -> None:
     parser.add_argument("--job-prefix", default="bv216")
     parser.add_argument("--block-seconds", type=float, default=216.0)
     parser.add_argument("--total-seconds", type=float, default=21600.0)
-    parser.add_argument("--abaqus-cmd", default="abaqus")
+    parser.add_argument("--abaqus-cmd", default=None)
     parser.add_argument("--python-cmd", default=sys.executable)
     parser.add_argument("--mode", choices=("plating", "stripping", "cycling"),
                         default="cycling")
@@ -286,6 +308,7 @@ def main() -> None:
     parser.add_argument("--delete-restart-after-join", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
+    args.abaqus_cmd = find_abaqus_command(args.abaqus_cmd)
 
     args.workdir.mkdir(parents=True, exist_ok=True)
     umat = args.workdir / args.umat.name
