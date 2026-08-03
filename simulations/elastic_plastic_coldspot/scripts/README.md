@@ -34,15 +34,15 @@ python scripts/generate_bv_cdot_map.py results/tables/final_v2_p5_interface_data
 
 Model variables:
 
-- `k-neg`: negative-electrode reaction rate constant, in `mol/(m^2 s)`. The default is `0.01`, from Tian and Qi Table II.
-- `j0`: optional reference exchange current density, in `A/m^2`. If omitted, the script uses `F*k-neg`.
+- `j0`: reference exchange current density, in `A/m^2`. The default is `1.0`, used as a practical Li|LLZO placeholder for normalized current redistribution.
+- `k-neg`: optional negative-electrode reaction rate constant, in `mol/(m^2 s)`. If supplied, the script uses `F*k-neg` instead of `j0`.
 - `eta`: global overpotential, in `V`; negative favors plating by the usual BV sign convention.
 - `alpha`: charge-transfer coefficient.
 - `temperature`: temperature in `K`.
 - `concentration-ratio`: `CLi+ / CLi,all`.
 - `contact_factor`: active reaction factor from `COPEN`/`CPRESS`, or `S22_Stress` fallback.
 - `cold_factor`: initial coldspot reaction factor, set to `0.1` for `x=9-11 um` with `0.5 um` ramps.
-- `j0_eff = F*k-neg*contact_factor*cold_factor`, unless `j0` is supplied explicitly.
+- `j0_eff = j0*contact_factor*cold_factor`, unless `k-neg` is supplied explicitly.
 
 The script does not solve an electrolyte potential field. It uses one global
 overpotential and lets mechanics enter through the effective active contact

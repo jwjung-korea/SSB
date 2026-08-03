@@ -113,12 +113,12 @@ def main() -> None:
 
     parser.add_argument("--base-cdot", type=float, default=103.643,
                         help="Mean UMAT cdot magnitude to preserve.")
-    parser.add_argument("--j0", type=float, default=None,
+    parser.add_argument("--j0", type=float, default=1.0,
                         help="Reference exchange current density in A/m^2. "
-                             "If omitted, F*k-neg is used.")
-    parser.add_argument("--k-neg", type=float, default=0.01,
+                             "Default is a practical Li|LLZO placeholder.")
+    parser.add_argument("--k-neg", type=float, default=None,
                         help="Negative-electrode reaction rate constant in "
-                             "mol/(m^2 s), matching Tian and Qi Table II.")
+                             "mol/(m^2 s). If supplied, F*k-neg overrides j0.")
     parser.add_argument("--eta", type=float, default=-0.05,
                         help="Global overpotential in V. Negative favors plating.")
     parser.add_argument("--alpha", type=float, default=0.5,
@@ -137,7 +137,7 @@ def main() -> None:
     args = parser.parse_args()
 
     mode_sign = 1.0 if args.mode == "plating" else -1.0
-    reference_j0 = args.j0 if args.j0 is not None else FARADAY * args.k_neg
+    reference_j0 = FARADAY * args.k_neg if args.k_neg is not None else args.j0
     rows = read_rows(args.interface_csv)
 
     records: list[dict[str, float]] = []
