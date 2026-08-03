@@ -177,7 +177,7 @@ C
      +     Fp_tau,Fg_tau,nuP_tau,S_tau,Y_tau,gBarP_tau,eBarP_tau,c_tau,
      +     T_tau,plasticwork)
       include 'aba_param.inc'
-      integer i,j,k,l,nprops
+      integer i,j,k,l,nprops,map_found
       character*80 cmname
       real*8 coords(3),step_time,props(nprops),dtime,F_t(3,3),F_tau(3,3)
       real*8 Fp_t(3,3),Fp_tau(3,3),nuP_t,Fg_t(3,3),gBarP_t,gBarP_tau
@@ -208,18 +208,26 @@ C
       Kbulk  = Eyoung/(three*(one-two*poisson))
       call onem(Iden)
       if ((props(11).gt.0.1d0).or.(cmname(1:10).eq.'LITHIUM_IP')) then
-          cdot0 = 103.643d0
-          if(mod(int(step_time/2160.d0),2).ne.0) cdot0 = -cdot0
-          if(coords(1).lt.8.5d0) then
-              cdot = cdot0
-          elseif(coords(1).ge.8.5d0 .and. coords(1).le.9.0d0) then
-              cdot = cdot0 - (cdot0 - cdot0/10.d0)*(coords(1) - 8.5d0)/0.5d0
-          elseif(coords(1).gt.9.0d0 .and. coords(1).lt.11.0d0) then
-              cdot = cdot0/10.d0
-          elseif(coords(1).ge.11.0d0 .and. coords(1).le.11.5d0) then
-              cdot = cdot0/10.d0 + (cdot0 - cdot0/10.d0)*(coords(1) - 11.0d0)/0.5d0
-          else
-              cdot = cdot0
+          call cdot_from_map(coords(1),cdot,map_found)
+          if(map_found.eq.0) then
+              cdot0 = 103.643d0
+              if(mod(int(step_time/2160.d0),2).ne.0) cdot0 = -cdot0
+              if(coords(1).lt.8.5d0) then
+                  cdot = cdot0
+              elseif(coords(1).ge.8.5d0 .and.
+     +               coords(1).le.9.0d0) then
+                  cdot = cdot0 - (cdot0 - cdot0/10.d0)*
+     +                   (coords(1) - 8.5d0)/0.5d0
+              elseif(coords(1).gt.9.0d0 .and.
+     +               coords(1).lt.11.0d0) then
+                  cdot = cdot0/10.d0
+              elseif(coords(1).ge.11.0d0 .and.
+     +               coords(1).le.11.5d0) then
+                  cdot = cdot0/10.d0 + (cdot0 - cdot0/10.d0)*
+     +                   (coords(1) - 11.0d0)/0.5d0
+              else
+                  cdot = cdot0
+              endif
           endif
       else
           cdot = 0.d0
@@ -286,6 +294,60 @@ C
       plasticwork = S_tau*nuP_tau
       return
       end subroutine integ
+C
+      subroutine cdot_from_map(x,cdot,map_found)
+      include 'aba_param.inc'
+      integer maxmap,nmap,map_loaded,map_found,i
+      parameter(maxmap=2000)
+      real*8 x,cdot,xmap(maxmap),cdotmap(maxmap),xtmp,ctmp,frac
+      character*256 line
+      save nmap,map_loaded,xmap,cdotmap
+      data nmap /0/
+      data map_loaded /0/
+C
+      if(map_loaded.eq.0) then
+          map_loaded = 1
+          nmap = 0
+          open(unit=98,file='cdot_map.csv',status='old',err=90)
+ 10       continue
+          read(98,'(A)',end=20,err=20) line
+          read(line,*,err=10) xtmp,ctmp
+          if(nmap.lt.maxmap) then
+              nmap = nmap + 1
+              xmap(nmap) = xtmp
+              cdotmap(nmap) = ctmp
+          endif
+          goto 10
+ 20       continue
+          close(98)
+ 90       continue
+      endif
+C
+      if(nmap.le.0) then
+          map_found = 0
+          cdot = 0.d0
+          return
+      endif
+C
+      map_found = 1
+      if(x.le.xmap(1)) then
+          cdot = cdotmap(1)
+          return
+      endif
+      if(x.ge.xmap(nmap)) then
+          cdot = cdotmap(nmap)
+          return
+      endif
+      do i=1,nmap-1
+          if(x.ge.xmap(i).and.x.le.xmap(i+1)) then
+              frac = (x - xmap(i))/(xmap(i+1) - xmap(i))
+              cdot = cdotmap(i) + frac*(cdotmap(i+1)-cdotmap(i))
+              return
+          endif
+      enddo
+      cdot = cdotmap(nmap)
+      return
+      end subroutine cdot_from_map
 C
       subroutine spectral(A,eig,vec)
       include 'aba_param.inc'

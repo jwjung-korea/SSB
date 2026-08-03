@@ -18,4 +18,15 @@ This folder contains the reproducible files for the lithium/LLZO electrodepositi
 
 The existing model compares stack pressures of 1, 3, 5, and 10 MPa for a lithium/LLZO interface with a prescribed coldspot growth-rate reduction around `x = 9-11 um`.
 
-The next development step on this branch is to replace the hard-coded coldspot growth rate with a contact-aware current-density map for staggered electrochemical-mechanical coupling.
+## Contact-Aware Coupling Prototype
+
+`src/umat_EP_coldspot.for` now checks for `cdot_map.csv` in the Abaqus job working directory. If present, it linearly interpolates `cdot` from that map using the integration point `x` coordinate. If the map is absent, the original hard-coded coldspot behavior is retained as a fallback.
+
+`scripts/generate_cdot_map.py` creates that map from interface extraction data. This supports a staggered workflow:
+
+```text
+Abaqus mechanical/contact block
+-> extract interface contact/stress data
+-> generate cdot_map.csv
+-> run the next Abaqus block with updated local growth rates
+```
