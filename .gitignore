@@ -17,6 +17,7 @@
 scratch/
 temp/
 work/
+verify/
 
 # Python caches
 __pycache__/

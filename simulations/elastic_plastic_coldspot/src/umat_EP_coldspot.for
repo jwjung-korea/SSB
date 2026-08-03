@@ -185,11 +185,14 @@ C
       real*8 Fi_tr(3,3),Fi_tr_inv(3,3),Fe_tr(3,3),Re_tr(3,3),Ue_tr(3,3)
       real*8 Ee_tr(3,3),trEe_tr,Ee0_tr(3,3),Me_tr(3,3),Me0_tr(3,3)
       real*8 tauBar_tr,Np(3,3),detF_tau,detFg_tau,lambda_g1,lambda_g2
-      real*8 lambda_g3,Fg_tau(3,3),Fi_tau(3,3),Fi_tau_inv(3,3),Fe_tau(3,3)
+      real*8 lambda_g3,Fg_tau(3,3),Fi_tau(3,3)
+      real*8 Fi_tau_inv(3,3),Fe_tau(3,3)
       real*8 Re_tau(3,3),Ue_tau(3,3),Ee_tau(3,3),Ee_tau_dev(3,3),trEe_tau
       real*8 Me_tau(3,3),Y_t,Y_tau,eBarP_t,eBarP_tau,H_t,dGamma,detFe_tau
-      real*8 Eyoung,poisson,Y0,H0,Ysat,ahard,Omega,alpha1,alpha2,alpha3,cdot,cdot0        
-      real*8 Gshear,Kbulk,Stilde,fac,Hsign,Dp_eig(3),Dp_vec(3,3),expdtDp(3,3)
+      real*8 Eyoung,poisson,Y0,H0,Ysat,ahard,Omega
+      real*8 alpha1,alpha2,alpha3,cdot,cdot0
+      real*8 Gshear,Kbulk,Stilde,fac,Hsign,Dp_eig(3)
+      real*8 Dp_vec(3,3),expdtDp(3,3)
       real*8 c_t,c_tau,tmp,Dp_tau(3,3)
       parameter(zero=0.d0,one=1.d0,two=2.d0,three=3.d0,half=0.5d0,
      +     root_three=1.732050807568877d0)
