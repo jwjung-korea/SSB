@@ -77,13 +77,15 @@ TOP_SURF_EL, S3
 **
 ** MATERIALS
 *Material, name=LITHIUM_IP
-*User material, Constants=11
-  7.2e3,   0.38,  3.1,  5.7,   2.0,  2.0,  1.3e-05, 0.0,   1.0,   0.0,   103.643
+*User material, Constants=16
+  7.81e3,  0.38,  4.254e4, 37., 298., 0.15, 0.95, 10.
+     2.0,   2.0,     0.05,  1.3e-05, 0.0, 1.0, 0.0, 103.643
 *Depvar
 24
 *Material, name=LITHIUM_SUB
-*User material, Constants=11
-  7.2e3,   0.38,  3.1,  5.7,   2.0,  2.0,  1.3e-05, 0.0,   1.0,   0.0,   0.0
+*User material, Constants=16
+  7.81e3,  0.38,  4.254e4, 37., 298., 0.15, 0.95, 10.
+     2.0,   2.0,     0.05,  1.3e-05, 0.0, 1.0, 0.0, 0.0
 *Depvar
 24
 *Material, name=LLZO

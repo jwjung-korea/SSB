@@ -24,21 +24,27 @@ C
       real*8 gBarP_t,gBarP_tau,eBarP_t,eBarP_tau,c_t,c_tau
       real*8 Gshear,Kbulk,plasticwork,detF_tau,detF_per,dE,perM(3,3)
       real*8 F_per(3,3),T_per(3,3),eBarLmt,umeror
-      real*8 Eyoung,poisson,Y0,H0,Ysat,ahard,Omega,alpha1,alpha2,alpha3
+      real*8 Eyoung,poisson,Apre,Qact,T0,mRate,Y0,H0,Ysat,ahard,nhard
+      real*8 Omega,alpha1,alpha2,alpha3
 C
       parameter(zero=0.d0,one=1.d0,two=2.d0,three=3.d0,half=0.5d0,
      +     root_three=1.732050807568877d0)
 C
       Eyoung  = props(1)
       poisson = props(2)
-      Y0      = props(3)
-      H0      = props(4)
-      Ysat    = props(5)
-      ahard   = props(6)
-      Omega   = props(7)
-      alpha1  = props(8)
-      alpha2  = props(9)
-      alpha3  = props(10)
+      Apre    = props(3)
+      Qact    = props(4)
+      T0      = props(5)
+      mRate   = props(6)
+      Y0      = props(7)
+      H0      = props(8)
+      Ysat    = props(9)
+      ahard   = props(10)
+      nhard   = props(11)
+      Omega   = props(12)
+      alpha1  = props(13)
+      alpha2  = props(14)
+      alpha3  = props(15)
 C
       Gshear = Eyoung/(two*(one+poisson))
       Kbulk  = Eyoung/(three*(one-two*poisson))
@@ -188,29 +194,39 @@ C
       real*8 lambda_g3,Fg_tau(3,3),Fi_tau(3,3)
       real*8 Fi_tau_inv(3,3),Fe_tau(3,3)
       real*8 Re_tau(3,3),Ue_tau(3,3),Ee_tau(3,3),Ee_tau_dev(3,3),trEe_tau
-      real*8 Me_tau(3,3),Y_t,Y_tau,eBarP_t,eBarP_tau,H_t,dGamma,detFe_tau
-      real*8 Eyoung,poisson,Y0,H0,Ysat,ahard,Omega
+      real*8 Me_tau(3,3),Y_t,Y_tau,eBarP_t,eBarP_tau,H_t,detFe_tau
+      real*8 Eyoung,poisson,Apre,Qact,T0,mRate,Y0,H0,Ysat,ahard,nhard
       real*8 alpha1,alpha2,alpha3,cdot,cdot0
-      real*8 Gshear,Kbulk,Stilde,fac,Hsign,Dp_eig(3)
+      real*8 Gshear,Kbulk,Stilde,fac,Hsign,Dp_eig(3),Omega
+      real*8 nu0,Ssat,Rgas,lower,upper,mid,gmid,gu,S_mid
       real*8 Dp_vec(3,3),expdtDp(3,3)
       real*8 c_t,c_tau,tmp,Dp_tau(3,3)
+      integer iter
       parameter(zero=0.d0,one=1.d0,two=2.d0,three=3.d0,half=0.5d0,
      +     root_three=1.732050807568877d0)
+      parameter(Rgas=8.314d-3)
       Eyoung  = props(1)
       poisson = props(2)
-      Y0      = props(3)
-      H0      = props(4)
-      Ysat    = props(5)
-      ahard   = props(6)
-      Omega   = props(7)
-      alpha1  = props(8)
-      alpha2  = props(9)
-      alpha3  = props(10)
-      cdot    = props(11)
+      Apre    = props(3)
+      Qact    = props(4)
+      T0      = props(5)
+      mRate   = props(6)
+      Y0      = props(7)
+      H0      = props(8)
+      Ysat    = props(9)
+      ahard   = props(10)
+      nhard   = props(11)
+      Omega   = props(12)
+      alpha1  = props(13)
+      alpha2  = props(14)
+      alpha3  = props(15)
+      cdot    = props(16)
       Gshear = Eyoung/(two*(one+poisson))
       Kbulk  = Eyoung/(three*(one-two*poisson))
+      nu0 = root_three*Apre*dexp(-Qact/(Rgas*T0))
+      Ssat = Ysat/root_three
       call onem(Iden)
-      if ((props(11).gt.0.1d0).or.(cmname(1:10).eq.'LITHIUM_IP')) then
+      if ((props(16).gt.0.1d0).or.(cmname(1:10).eq.'LITHIUM_IP')) then
           call cdot_from_map(coords(1),cdot,map_found)
           if(map_found.eq.0) then
               cdot0 = 103.643d0
@@ -237,7 +253,7 @@ C
       endif
       c_tau = c_t + dtime*cdot
       if (c_tau.lt.zero) c_tau = zero
-      detFg_tau = one + 1.3d-5*c_tau
+      detFg_tau = one + Omega*c_tau
       lambda_g1 = one + 0.d0*(detFg_tau - one)
       lambda_g2 = one + 1.d0*(detFg_tau - one)
       lambda_g3 = one + 0.d0*(detFg_tau - one)
@@ -262,13 +278,52 @@ C
       else
          Np = zero
       endif
-      if(tauBar_tr.le.S_t) then
-         nuP_tau = zero
+      if (nu0.le.zero) nu0 = 1.d-30
+      if (nuP_t.gt.zero) then
+         Stilde = Ssat*(nuP_t/nu0)**nhard
+      else
+         Stilde = Ssat
+      endif
+      fac = one - S_t/Stilde
+      if(dabs(fac).le.1.d-12) then
          H_t = zero
       else
-         H_t    = H0/three
-         dGamma = (tauBar_tr - S_t) / (Gshear + H_t)
-         nuP_tau = max(dGamma / dtime, zero)
+         Hsign = fac/dabs(fac)
+         H_t = (H0/three)*(dabs(fac)**ahard)*Hsign
+      endif
+      if(tauBar_tr.le.zero) then
+         nuP_tau = zero
+      else
+         lower = 1.d-12
+         upper = one
+         S_mid = S_t + H_t*dtime*lower
+         gmid = tauBar_tr - dtime*Gshear*lower
+     +        - S_mid*((lower/nu0)**mRate)
+         if(gmid.lt.zero) then
+            nuP_tau = zero
+         else
+            S_mid = S_t + H_t*dtime*upper
+            gu = tauBar_tr - dtime*Gshear*upper
+     +           - S_mid*((upper/nu0)**mRate)
+            do while(gu.gt.zero)
+               upper = 10.d0*upper
+               S_mid = S_t + H_t*dtime*upper
+               gu = tauBar_tr - dtime*Gshear*upper
+     +              - S_mid*((upper/nu0)**mRate)
+            enddo
+            do iter=1,80
+               mid = half*(lower+upper)
+               S_mid = S_t + H_t*dtime*mid
+               gmid = tauBar_tr - dtime*Gshear*mid
+     +              - S_mid*((mid/nu0)**mRate)
+               if(gmid.gt.zero) then
+                  lower = mid
+               else
+                  upper = mid
+               endif
+            enddo
+            nuP_tau = half*(lower+upper)
+         endif
       endif
       gBarP_tau = gBarP_t + dtime*nuP_tau
       eBarP_tau = gBarP_tau/root_three
