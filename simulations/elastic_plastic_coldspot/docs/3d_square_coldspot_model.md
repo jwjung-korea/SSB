@@ -55,6 +55,25 @@ The script writes:
 The generated files are intentionally kept outside git because they are Abaqus
 outputs. The script is the source of truth.
 
+## Opening CAE
+
+Use this launcher when working on the generated 3D model in CAE:
+
+```bat
+simulations\elastic_plastic_coldspot\scripts\launch_cae_2024_3d_workdir.bat
+```
+
+It does two things before opening CAE:
+
+- loads the Intel oneAPI compiler environment for UMAT jobs
+- changes the working directory to
+  `C:\Abaqus_Work\lithium_electrodeposition\elastic_plastic_coldspot_3d`
+
+This matters for killing jobs from CAE. If CAE starts a job from `C:\Temp`,
+`abaqus terminate job=<job-name>` issued from the model folder cannot find the
+job client id. When that happens, either terminate from `C:\Temp` or reopen CAE
+with the launcher above and set the CAE work directory to the model folder.
+
 ## Abaqus 2024 Datacheck
 
 The representative `5 MPa` input was checked with:
